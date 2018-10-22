@@ -17,6 +17,7 @@ engine = db.createEngine()
 def index():
     return render_template('index.html')
 
+
 @app.route('/do_login', methods=['POST'])
 def do_login():
     data = request.form
@@ -29,6 +30,7 @@ def do_login():
             return render_template('main.html')
 
     return "wrong username/password..."
+
 
 @app.route('/do_signin', methods=['POST'])
 def do_signin():
@@ -50,10 +52,60 @@ def do_signin():
 def foro():
     return render_template('main.html', title="foro")
 
+
 @app.route('/logout')
 def logout():
     session.clear()
     return render_template('index.html')
+
+
+@app.route('/users', methods =['GET'])
+def users():
+    db_session = db.getSession(engine)
+    users = db_session.query(entities.User)
+    data = []
+    for user in users:
+        data.append(user)
+    return Response(json.dumps(data,
+                               cls=connector.AlchemyEncoder),
+                    mimetype='application/json')
+
+
+@app.route('/users/<id>', methods = ['GET'])
+def get_user(id):
+    db_session = db.getSession(engine)
+    users = db_session.query(entities.User).filter(entities.User.id == id)
+    data = []
+    for user in users:
+        data.append(user)
+    return Response(json.dumps(data,
+                               cls=connector.AlchemyEncoder),
+                    mimetype='application/json')
+
+
+@app.route('/users/<id>', methods = ['PUT'])
+def update_user(id):
+    db_session = db.getSession(engine)
+    users = db_session.query(entities.User).filter(entities.User.id == id)
+    for user in users:
+        user.name = request.form['name']
+        user.fullname = request.form['fullname']
+        user.password = request.form['password']
+        user.username = request.form['username']
+        db_session.add(user)
+    db_session.commit()
+    return "User updated"
+
+
+@app.route('/users/<id>', methods = ['DELETE'])
+def delete_user(id):
+    db_session = db.getSession(engine)
+    users = db_session.query(entities.User).filter(entities.User.id == id)
+    for user in users:
+        db_session.delete(user)
+    db_session.commit()
+    return "User deleted"
+
 
 if __name__ == '__main__':
     app.secret_key = "iLikeBananas"
