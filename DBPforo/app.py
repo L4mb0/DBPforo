@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session, request, jsonify, Response
+from flask import Flask, render_template, session, request, jsonify, Response, Blueprint
 from model import entities
 from database import connector
 from sqlalchemy import create_engine
@@ -12,6 +12,11 @@ db = connector.Manager()
 cache = {}
 engine = db.createEngine()
 
+errors = Blueprint('errors', __name__)
+
+@errors.app_errorhandler(404)
+def error_404(error):
+    return render_template('404.html'),404
 
 @app.route('/')
 def index():
@@ -105,6 +110,8 @@ def delete_user(id):
         db_session.delete(user)
     db_session.commit()
     return "User deleted"
+
+app.register_blueprint(errors)
 
 
 if __name__ == '__main__':
