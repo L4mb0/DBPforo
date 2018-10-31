@@ -5,6 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import json
+import datetime
 
 app = Flask(__name__)
 db = connector.Manager()
@@ -105,6 +106,75 @@ def delete_user(id):
         db_session.delete(user)
     db_session.commit()
     return "User deleted"
+
+
+@app.route('/do_post')
+def do_post():
+    return render_template('post.html')
+
+
+@app.route('/create_post', methods=['POST'])
+def create_post():
+    c = request.get_json(silent=True)
+    db_session = db.getSession(engine)
+    user_from = db_session.query(entities.User
+                                 ).filter(entities.User.id == c['user_from_id']).first()
+
+    post = entities.Post(content=c['content'],
+                               user_from=user_from,
+                               sent_on=datetime.datetime.utcnow()
+                               )
+    db_session.add(post)
+    db_session.commit()
+    return "Your post has been uploaded"
+
+
+@app.route('/posts', methods = ['GET'])
+def posts():
+    db_session = db.getSession(engine)
+    posts = db_session.query(entities.Post)
+    data = []
+    for post in posts:
+        data.append(post)
+    return Response(json.dumps(data,
+                               cls=connector.AlchemyEncoder),
+                    mimetype='application/json')
+
+
+@app.route('/posts/<id>', methods = ['GET'])
+def get_post(id):
+    db_session = db.getSession(engine)
+    posts = db_session.query(entities.Post).filter(entities.Post.id == id)
+    data = []
+    for post in posts:
+        data.append(post)
+    return Response(json.dumps(data,
+                               cls=connector.AlchemyEncoder),
+                    mimetype='application/json')
+
+
+@app.route('/posts/<id>', methods = ['PUT'])
+def update_posts(id):
+    db_session = db.getSession(engine)
+    posts = db_session.query(entities.Post).filter(entities.Post.id == id)
+    for post in posts:
+        post.content = request.form['content']
+        post.sent_on = request.form['sent_on']
+        post.user_from_id = request.form['password']
+        post.user_from = request.form['user_from']
+        db_session.add(post)
+    db_session.commit()
+    return "Message updated"
+
+
+@app.route('/messages/<id>', methods = ['DELETE'])
+def delete_message(id):
+    db_session = db.getSession(engine)
+    posts = db_session.query(entities.Post).filter(entities.Post.id == id)
+    for post in posts:
+        db_session.delete(post)
+    db_session.commit()
+    return "Message deleted"
 
 
 if __name__ == '__main__':
