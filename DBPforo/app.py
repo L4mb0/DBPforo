@@ -62,6 +62,10 @@ def do_signin():
 def foro():
     return render_template('main.html', title="foro")
 
+@app.route('/calendar')
+def calendar():
+    return render_template('calendar.html', title='calendar')
+
 
 @app.route('/logout')
 def logout():
