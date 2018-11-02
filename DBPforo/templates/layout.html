@@ -108,6 +108,7 @@ a.article-title:hover {
           <div class="collapse navbar-collapse" id="navbarToggle">
             <div class="navbar-nav mr-auto">
               <a class="nav-item nav-link" href="/foro">Home</a>
+                <a class="nav-item nav-link" href="/do_post">Create a Post</a>
             </div>
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
@@ -120,7 +121,8 @@ a.article-title:hover {
     <main role="main" class="container">
       <div class="row">
         <div class="col-md-8">
-          {% block content %}{% endblock %}
+          {% block content %}
+            {% endblock %}
         </div>
         <div class="col-md-4">
           <div class="content-section">
