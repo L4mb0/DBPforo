@@ -1,6 +1,8 @@
-from flask import Flask, render_template, session, request, jsonify, Response, Blueprint
+from flask import Flask, render_template, session, request, jsonify, Response, Blueprint,flash
 from model import entities
 from database import connector
+from tkinter import *
+import tkinter.messagebox
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -33,9 +35,11 @@ def do_login():
 
     for User in users:
         if User.username == data['username'] and User.password == data['password']:
-            return render_template('main.html')
-
-    return "wrong username/password..."
+            return \
+                render_template('main.html')
+        else:
+            flash('fail to login')
+            return render_template('index.html')
 
 
 @app.route('/do_signin', methods=['POST'])
