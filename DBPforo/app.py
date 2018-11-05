@@ -1,6 +1,8 @@
-from flask import Flask, render_template, session, request, jsonify, Response
+from flask import Flask, render_template, session, request, jsonify, Response, Blueprint,flash
 from model import entities
 from database import connector
+from tkinter import *
+import tkinter.messagebox
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -13,6 +15,11 @@ db = connector.Manager()
 cache = {}
 engine = db.createEngine()
 
+errors = Blueprint('errors', __name__)
+
+@errors.app_errorhandler(404)
+def error_404(error):
+    return render_template('404.html'),404
 
 @app.route('/')
 def index():
@@ -28,9 +35,11 @@ def do_login():
 
     for User in users:
         if User.username == data['username'] and User.password == data['password']:
-            return render_template('main.html')
-
-    return "wrong username/password..."
+            return \
+                render_template('main.html')
+        else:
+            flash('fail to login')
+            return render_template('index.html')
 
 
 @app.route('/do_signin', methods=['POST'])
@@ -53,6 +62,12 @@ def do_signin():
 def foro():
     return render_template('main.html', title="foro")
 
+
+@app.route('/calendar')
+def calendar():
+    return render_template('calendar.html', title='calendar')
+
+  
 @app.route('/logout')
 def logout():
     session.clear()
@@ -105,6 +120,8 @@ def delete_user(id):
         db_session.delete(user)
     db_session.commit()
     return "User deleted"
+
+app.register_blueprint(errors)
 
 
 @app.route('/do_post')
