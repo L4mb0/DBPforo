@@ -62,11 +62,12 @@ def do_signin():
 def foro():
     return render_template('main.html', title="foro")
 
+
 @app.route('/calendar')
 def calendar():
     return render_template('calendar.html', title='calendar')
 
-
+  
 @app.route('/logout')
 def logout():
     session.clear()
@@ -130,19 +131,13 @@ def do_post():
 
 @app.route('/create_post', methods=['POST'])
 def create_post():
-    c = request.get_json(silent=True)
-    db_session = db.getSession(engine)
-    user_from = db_session.query(entities.User
-                                 ).filter(entities.User.id == c['user_from_id']).first()
-
-    post = entities.Post(content=c['content'],
-                               user_from=user_from,
-                               sent_on=datetime.datetime.utcnow()
-                               )
-    db_session.add(post)
-    db_session.commit()
+    content = request.form['content']
+    print(content)
+    post = entities.Post(content=content, posted_on = datetime.datetime.utcnow())
+    session = db.getSession(engine)
+    session.add(post)
+    session.commit()
     return "Your post has been uploaded"
-
 
 @app.route('/posts', methods = ['GET'])
 def posts():
@@ -175,21 +170,21 @@ def update_posts(id):
     for post in posts:
         post.content = request.form['content']
         post.sent_on = request.form['sent_on']
-        post.user_from_id = request.form['password']
+        post.user_from_id = request.form['user_from_id']
         post.user_from = request.form['user_from']
         db_session.add(post)
     db_session.commit()
     return "Message updated"
 
 
-@app.route('/messages/<id>', methods = ['DELETE'])
+@app.route('/posts/<id>', methods = ['DELETE'])
 def delete_message(id):
     db_session = db.getSession(engine)
     posts = db_session.query(entities.Post).filter(entities.Post.id == id)
     for post in posts:
         db_session.delete(post)
     db_session.commit()
-    return "Message deleted"
+    return "Post deleted"
 
 
 if __name__ == '__main__':
