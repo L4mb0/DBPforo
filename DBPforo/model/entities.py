@@ -14,7 +14,6 @@ class User(connector.Manager.Base):
 class Post(connector.Manager.Base):
     __tablename__ = 'posts'
     id = Column(Integer, Sequence('message_id_seq'), primary_key=True)
-    title = Column(String(50))
     content = Column(String(500))
     posted_on = Column(DateTime(timezone=True))
     user_from_id = Column(Integer, ForeignKey('users.id'))

@@ -1,16 +1,11 @@
 {% extends "layout.html" %}
 {% block content %}
-     <div>
+            <div>
                 <h1>SHARE YOUR IDEAS!</h1>
             </div>
             <div>
                 <form action="/create_post" method="POST">
                 <table>
-                    <tr>
-                        <td>
-                            <input type="text" name="title" id="title" placeholder="Title of your post...">
-                        </td>
-                    </tr>
                     <tr>
                         <td>
                             <textarea name="content" id="content" placeholder="Write your post here..." style="width:650px;height:250px"></textarea>

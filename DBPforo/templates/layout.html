@@ -98,6 +98,9 @@ a.article-title:hover {
 </style>
 
 <body>
+<script src="/static/js/libs/jquery-3.3.1.js"></script>
+<script src="/static/js/libs/bootstrap.min.js"></script>
+<script src="/static/js/posts.js"></script>
     <header class="site-header">
       <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
         <div class="container">
@@ -107,7 +110,7 @@ a.article-title:hover {
           </button>
           <div class="collapse navbar-collapse" id="navbarToggle">
             <div class="navbar-nav mr-auto">
-              <a class="nav-item nav-link" href="/main">Home</a>
+              <a class="nav-item nav-link" href="/foro">Home</a>
                 <a class="nav-item nav-link" href="/do_post">Create a Post</a>
             </div>
             <!-- Navbar Right Side -->
@@ -129,7 +132,7 @@ a.article-title:hover {
             <h3>Our Sidebar</h3>
             <p class='text-muted'>oli boli
               <ul class="list-group">
-                <li class="list-group-item list-group-item-light">Latest Posts</li>
+                <li class="list-group-item list-group-item-light" onclick="get_posts()">Latest Posts</li>
                 <li class="list-group-item list-group-item-light">Announcements</li>
                 <li class="list-group-item list-group-item-light">Calendars</li>
                 <li class="list-group-item list-group-item-light">etc</li>
