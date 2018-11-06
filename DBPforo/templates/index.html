@@ -20,7 +20,7 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='foro.css') }}">
         {%if title%}
             <title>BatiForo - {{ title }}</title>
         {% else %}
@@ -164,14 +164,14 @@ span.psw {
 
 
     <div class="container">
-      <input type="hidden" id="ID" name="ID">
+      <input type="hidden" name="ID">
 
 		<label for="username"><b>Username</b></label>
-      <input type="username" placeholder="Escriba su Usuario" class="form-control" name="username" required>
+      <input type="text" id="log_username" placeholder="Escriba su Usuario" class="form-control" name="username" required>
 
 
       <label for="password"><b>Password</b></label>
-      <input type="password" placeholder="Escriba su Password" class="form-control"  name="password" required>
+      <input type="password" id="log_password" placeholder="Escriba su Password" class="form-control"  name="password" required>
 
       <button type="submit" id="Loginbtn">Login</button>
       <label>

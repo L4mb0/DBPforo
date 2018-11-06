@@ -28,18 +28,17 @@ def index():
 
 @app.route('/do_login', methods=['POST'])
 def do_login():
-    data = request.form
+    username = request.form['username']
+    password = request.form['password']
 
     session = db.getSession(engine)
     users = session.query(entities.User)
 
-    for User in users:
-        if User.username == data['username'] and User.password == data['password']:
-            return \
-                render_template('main.html')
-        else:
-            flash('fail to login')
-            return render_template('index.html')
+    for user in users:
+        if user.username == username and user.password == password:
+            return  render_template('home.html')
+
+    return render_template('index.html')
 
 
 @app.route('/do_signin', methods=['POST'])
@@ -60,8 +59,27 @@ def do_signin():
 
 @app.route('/foro')
 def foro():
-    return render_template('main.html', title="foro")
+    return render_template('home.html', title="foro")
 
+
+@app.route('/latest_posts', methods=['GET'])
+def get_posts():
+    db_session = db.getSession(engine)
+    posts = db_session.query(entities.Post)
+    table = "<table><content><table>"
+    fila = "<tr><td><id></td><td><content></td><td><user_from></td><td><posted_on></td>"
+    filas = ""
+
+    for post in posts:
+        temp = fila[:]
+        temp = temp.replace("<id>", str(post.id))
+        temp = temp.replace("<content>", str(post.content))
+        temp = temp.replace("<user_from>", str(post.user_from))
+        temp = temp.replace("<posted_on>", str(post.posted_on))
+        filas += temp
+        print(temp)
+    table = table.replace("<content>", filas)
+    return table
 
 @app.route('/calendar')
 def calendar():
