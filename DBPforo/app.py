@@ -1,4 +1,5 @@
 from flask import Flask, render_template, session, request, jsonify, Response, Blueprint,flash
+from bs4 import BeautifulSoup
 from model import entities
 from database import connector
 from tkinter import *
@@ -62,24 +63,9 @@ def foro():
     return render_template('home.html', title="foro")
 
 
-@app.route('/latest_posts', methods=['GET'])
+@app.route('/latest_posts')
 def get_posts():
-    db_session = db.getSession(engine)
-    posts = db_session.query(entities.Post)
-    table = "<table><content><table>"
-    fila = "<tr><td><id></td><td><content></td><td><user_from></td><td><posted_on></td>"
-    filas = ""
-
-    for post in posts:
-        temp = fila[:]
-        temp = temp.replace("<id>", str(post.id))
-        temp = temp.replace("<content>", str(post.content))
-        temp = temp.replace("<user_from>", str(post.user_from))
-        temp = temp.replace("<posted_on>", str(post.posted_on))
-        filas += temp
-        print(temp)
-    table = table.replace("<content>", filas)
-    return table
+    return render_template('main.html')
 
 @app.route('/calendar')
 def calendar():
@@ -155,7 +141,9 @@ def create_post():
     session = db.getSession(engine)
     session.add(post)
     session.commit()
-    return "Your post has been uploaded"
+
+    return render_template('main.html')
+
 
 @app.route('/posts', methods = ['GET'])
 def posts():
@@ -207,4 +195,4 @@ def delete_message(id):
 
 if __name__ == '__main__':
     app.secret_key = "iLikeBananas"
-    app.run(port=8080, threaded=True, host='0.0.0.0')
+    app.run(port=8080, threaded=True, debug=True, host='0.0.0.0')
