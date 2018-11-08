@@ -22,6 +22,10 @@ errors = Blueprint('errors', __name__)
 def error_404(error):
     return render_template('404.html'),404
 
+@errors.app_errorhandler(500)
+def error_500(error):
+    return render_template('500.html'),500
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -29,18 +33,29 @@ def index():
 
 @app.route('/do_login', methods=['POST'])
 def do_login():
-    username = request.form['username']
-    password = request.form['password']
+    data = request.form
 
-    session = db.getSession(engine)
-    users = session.query(entities.User)
+    sessiondb = db.getSession(engine)
+    users = sessiondb.query(entities.User)
 
-    for user in users:
-        if user.username == username and user.password == password:
-            return  render_template('home.html')
+    for User in users:
+        if User.username == data['username'] and User.password == data['password']:
+            session['logged'] = True
+            return render_template('main.html')
+        else:
+            flash('fail to login')
+            return render_template('index.html')
 
-    return render_template('index.html')
 
+@app.route('/current_user', methods = ['GET'])
+def current_user():
+    db_session = db.getSession(engine)
+    user = db_session.query(entities.User).filter(
+        entities.User.id == session['logged_user_id']
+    ).first()
+    return Response(json.dumps(user,
+                               cls=connector.AlchemyEncoder),
+                    mimetype='application/json')
 
 @app.route('/do_signin', methods=['POST'])
 def do_signin():
@@ -48,7 +63,7 @@ def do_signin():
     fullname = request.form['fullname']
     username = request.form['username']
     password = request.form['password']
-    print(name, fullname, username, password)
+    #print(name, fullname, username, password)
 
     user = entities.User(username=username, password=password, name=name, fullname=fullname)
 
@@ -60,21 +75,37 @@ def do_signin():
 
 @app.route('/foro')
 def foro():
-    return render_template('home.html', title="foro")
+        if session.get('logged') == True:
+            return \
+                render_template('main.html')
+        else:
+            flash('You are not logged in!')
+            return render_template('index.html')
 
 
 @app.route('/latest_posts')
 def get_posts():
     return render_template('main.html')
 
+@app.route('/announcements')
+def announcements():
+    return render_template('announcements.html')
+
+
 @app.route('/calendar')
 def calendar():
-    return render_template('calendar.html', title='calendar')
+        if session.get('logged') == True:
+            return \
+                render_template('calendar.html')
+        else:
+            flash('You are not logged in!')
+            return render_template('index.html')
 
   
 @app.route('/logout')
 def logout():
     session.clear()
+    session.pop('logged', None)
     return render_template('index.html')
 
 
@@ -102,7 +133,7 @@ def get_user(id):
                     mimetype='application/json')
 
 
-@app.route('/users/<id>', methods = ['PUT'])
+@app.route('/users', methods = ['PUT'])
 def update_user(id):
     db_session = db.getSession(engine)
     users = db_session.query(entities.User).filter(entities.User.id == id)
@@ -135,9 +166,10 @@ def do_post():
 
 @app.route('/create_post', methods=['POST'])
 def create_post():
+    title = request.form['title']
     content = request.form['content']
-    print(content)
-    post = entities.Post(content=content, posted_on = datetime.datetime.utcnow())
+    user_from = request.form['user_from']
+    post = entities.Post(title=title, content=content, posted_on=datetime.datetime.utcnow(), user_from=user_from)
     session = db.getSession(engine)
     session.add(post)
     session.commit()
@@ -191,6 +223,25 @@ def delete_message(id):
         db_session.delete(post)
     db_session.commit()
     return "Post deleted"
+
+@app.route('/crud_posts', methods=['GET'])
+def crud_posts():
+    return render_template("crud_posts.html")
+
+@app.route('/clean_posts', methods = ['GET'])
+def clean_posts():
+    db_session = db.getSession(engine)
+    posts = db_session.query(entities.Post)
+    for post in posts:
+        db_session.delete(post)
+
+    db_session.commit()
+    return "Todos los posts eliminados"
+
+
+@app.route('/crud_users', methods=['GET'])
+def crud_users():
+    return render_template("crud_users.html")
 
 
 if __name__ == '__main__':

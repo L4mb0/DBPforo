@@ -1,6 +1,10 @@
 {% extends "layout.html" %}
 {% block content %}
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+<script src="/static/js/posts.js"></script>
         <div id="postBox">
-            <h1 onclick="get_posts()">Latest Posts</h1>
+            <h1 >Latest Posts</h1>
+            <button onclick="get_posts()">Show Posts</button>
         </div>
 {% endblock content %}
