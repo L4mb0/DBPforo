@@ -30,13 +30,13 @@ def index():
 def do_login():
     data = request.form
 
-    session = db.getSession(engine)
-    users = session.query(entities.User)
+    sessiondb = db.getSession(engine)
+    users = sessiondb.query(entities.User)
 
     for User in users:
         if User.username == data['username'] and User.password == data['password']:
-            return \
-                render_template('main.html')
+            session['logged'] = True
+            return render_template('main.html')
         else:
             flash('fail to login')
             return render_template('index.html')
@@ -48,7 +48,7 @@ def do_signin():
     fullname = request.form['fullname']
     username = request.form['username']
     password = request.form['password']
-    print(name, fullname, username, password)
+    #print(name, fullname, username, password)
 
     user = entities.User(username=username, password=password, name=name, fullname=fullname)
 
@@ -60,16 +60,26 @@ def do_signin():
 
 @app.route('/foro')
 def foro():
-    return render_template('main.html', title="foro")
+        if session.get('logged') == True:
+            return \
+                render_template('main.html')
+        else:
+            flash('You are not logged in!')
+            return render_template('index.html')
 
 @app.route('/calendar')
 def calendar():
-    return render_template('calendar.html', title='calendar')
-
+        if session.get('logged') == True:
+            return \
+                render_template('calendar.html')
+        else:
+            flash('You are not logged in!')
+            return render_template('index.html')
 
 @app.route('/logout')
 def logout():
     session.clear()
+    session.pop('logged', None)
     return render_template('index.html')
 
 
@@ -128,17 +138,20 @@ def do_post():
     return render_template('post.html')
 
 
-@app.route('/create_post', methods=['POST'])
+@app.route('/create_post', methods=['POST, GET'])
 def create_post():
     c = request.get_json(silent=True)
     db_session = db.getSession(engine)
-    user_from = db_session.query(entities.User
-                                 ).filter(entities.User.id == c['user_from_id']).first()
 
-    post = entities.Post(content=c['content'],
-                               user_from=user_from,
-                               sent_on=datetime.datetime.utcnow()
-                               )
+    content = c['content']
+    title = c['title']
+    sent_on = datetime.datetime.utcnow()
+
+    user_from = db_session.query(entities.User).filter(entities.User.id == c['user_from_id']).first()
+
+
+    post = entities.Post(content=content, title=title, sent_on=sent_on, user_from=user_from)
+
     db_session.add(post)
     db_session.commit()
     return "Your post has been uploaded"
@@ -194,4 +207,4 @@ def delete_message(id):
 
 if __name__ == '__main__':
     app.secret_key = "iLikeBananas"
-    app.run(port=8080, threaded=True, host='0.0.0.0')
+    app.run(port=8080, threaded=True, host='0.0.0.0', debug=True)
