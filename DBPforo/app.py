@@ -1,12 +1,6 @@
 from flask import Flask, render_template, session, request, jsonify, Response, Blueprint,flash
-from bs4 import BeautifulSoup
 from model import entities
 from database import connector
-from tkinter import *
-import tkinter.messagebox
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
 import json
 import datetime
 
@@ -41,7 +35,7 @@ def do_login():
     for User in users:
         if User.username == data['username'] and User.password == data['password']:
             session['logged'] = True
-            return render_template('main.html')
+            return render_template('home.html')
         else:
             flash('fail to login')
             return render_template('index.html')
@@ -70,14 +64,14 @@ def do_signin():
     session = db.getSession(engine)
     session.add(user)
     session.commit()
-    return "successful register!!"
+    return render_template('index.html')
 
 
 @app.route('/foro')
 def foro():
         if session.get('logged') == True:
             return \
-                render_template('main.html')
+                render_template('home.html')
         else:
             flash('You are not logged in!')
             return render_template('index.html')
@@ -176,14 +170,13 @@ def create_post():
 
     return render_template('main.html')
 
-
 @app.route('/posts', methods = ['GET'])
 def posts():
     db_session = db.getSession(engine)
     posts = db_session.query(entities.Post)
     data = []
-    for post in posts:
-        data.append(post)
+    for Post in posts:
+        data.append(Post)
     return Response(json.dumps(data,
                                cls=connector.AlchemyEncoder),
                     mimetype='application/json')
@@ -243,7 +236,6 @@ def clean_posts():
 def crud_users():
     return render_template("crud_users.html")
 
-
+app.secret_key = "iLikeBananas"
 if __name__ == '__main__':
-    app.secret_key = "iLikeBananas"
-    app.run(port=8080, threaded=True, debug=True, host='0.0.0.0')
+    app.run(port=8080, threaded=True, host='0.0.0.0')
