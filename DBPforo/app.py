@@ -35,6 +35,7 @@ def do_login():
     for User in users:
         if User.username == data['username'] and User.password == data['password']:
             session['logged'] = True
+            session['logged_user_id'] = User.id
             return render_template('home.html')
         else:
             flash('fail to login')
@@ -221,19 +222,27 @@ def delete_message(id):
 def create_comment():
     c = request.get_json(silent=True)
     db_session = db.getSession(engine)
-    user_from = db_session.query(entities.User
-                                 ).filter(entities.User.id == c['user_from_id']).first()
-    post_id = db_session.query(entities.Post
-                               ).filter(entities.Post.id == c['id']).first()
+    content = request.form['content']
+    user_from = session['logged_user_id']
 
-    comment = entities.Message(content=c['content'],
+    comment = entities.Message(content=content,
                                user_from=user_from,
-                               post_id=post_id,
                                posted_on=datetime.datetime.utcnow()
                                )
     db_session.add(comment)
     db_session.commit()
     return render_template('main.html')
+
+@app.route('/comments', methods = ['GET'])
+def comments():
+    db_session = db.getSession(engine)
+    comments = db_session.query(entities.Comment)
+    data = []
+    for Comment in comments:
+        data.append(Comment)
+    return Response(json.dumps(data,
+                               cls=connector.AlchemyEncoder),
+                    mimetype='application/json')
 
 @app.route('/crud_posts', methods=['GET'])
 def crud_posts():

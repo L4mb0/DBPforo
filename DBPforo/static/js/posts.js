@@ -12,33 +12,19 @@ $.getJSON("/posts", function(data){
         });
     });
 
-function uploadComment(){
-    content = $('#comment_content').val();
-    $.ajax({
-        url: '/comments',
-        type: 'POST',
-        contentType:'application/json',
-        data: JSON.stringify({
-            "content":content,
-            "user_from":current_user,
-            "post_id":current_post_id
-        }),
-        dataType:'json'
+$.getJSON("/comments", function(data){
+    var i = 0;
+    $.each(data, function(){
+        if(current_post_id == data['post_id']){
+        e = '<div>'
+        e = e+'</div>';
+        i = i+1;
+        $("<div/>",{html:e}).appendTo("#post-footer");
+        }
     });
-    $.getJSON("/comments", function(data){
-        var i = 0;
-        $.each(data, function(){
-            if(current_post_id == data['post_id']){
-            e = '<div>'
-            e = e+'</div>';
-            i = i+1;
-            $("<div/>",{html:e}).appendTo("#post-footer");
-            }
-        });
-    });
-}
+});
 
 function commentForm(){
-    e = '<div class="comment"><form action="/create_comment" method="POST"><table><tr><td><input type="text" placeholder="Write a comment..." id="comment_content"></td><td><input type="button" value="comment" onClick="uploadComment"></td></tr></table></form></div>';
+    e = '<div class="comment"><form action="/comments" method="post"><table><tr><td><input type="text" placeholder="Write a comment..." id="comment_content"></td><td><input type="submit" value="comment"></td></tr></table></form></div>';
     $("<div/>",{html:e}).appendTo("#post-footer");
 }
