@@ -25,8 +25,17 @@ function uploadComment(){
         }),
         dataType:'json'
     });
-    get_messages(current_user, current_post_id);
-    $('#comment_content').val("")
+    $.getJSON("/comments", function(data){
+        var i = 0;
+        $.each(data, function(){
+            if(current_post_id == data['post_id']){
+            e = '<div>'
+            e = e+'</div>';
+            i = i+1;
+            $("<div/>",{html:e}).appendTo("#post-footer");
+            }
+        });
+    });
 }
 
 function commentForm(){
