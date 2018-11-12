@@ -19,3 +19,11 @@ class Post(connector.Manager.Base):
     posted_on = Column(DateTime(timezone=True))
     user_from_id = Column(Integer, ForeignKey('users.id'))
     user_from = Column(String(100))
+
+class Comment(connector.Manager.Base):
+    __tablename__ = 'comments'
+    id = Column(Integer, Sequence('comment_id_seq'), primary_key=True)
+    content = Column(String(500))
+    posted_on = Column(DateTime(timezone=True))
+    user_from = Column(String(100))
+    post_id = Column(Integer, ForeignKey('posts.id'))
