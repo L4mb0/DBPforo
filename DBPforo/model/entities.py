@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Sequence, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
-
+import datetime
 from database import connector
 
 class User(connector.Manager.Base):
@@ -16,7 +16,7 @@ class Post(connector.Manager.Base):
     id = Column(Integer, Sequence('message_id_seq'), primary_key=True)
     title = Column(String(100))
     content = Column(String(500))
-    posted_on = Column(DateTime(timezone=True))
+    posted_on = Column(DateTime, default=datetime.datetime.utcnow)
     user_from_id = Column(Integer, ForeignKey('users.id'))
     user_from = Column(String(100))
 

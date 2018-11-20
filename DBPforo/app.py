@@ -37,9 +37,9 @@ def do_login():
             session['logged'] = True
             session['logged_user_id'] = User.id
             return render_template('home.html')
-        else:
-            flash('fail to login')
-            return render_template('index.html')
+    else:
+        flash('fail to login')
+        return render_template('index.html')
 
 
 @app.route('/current_user', methods = ['GET'])
